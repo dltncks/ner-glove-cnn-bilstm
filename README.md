@@ -1,7 +1,7 @@
 # Named Entity Recognition using CNN + BiLSTM and GloVe Embeddings
 
 ## 1. Introduction
-Named Entity Recognition (NER) is a fundamental task in Natural Language Processing (NLP) that involves identifying and classifying named entities such as persons, organizations, locations, and miscellaneous entities in a given text. In this project, we implemented a CNN + BiLSTM-based model for NER, leveraging pre-trained GloVe embeddings to enhance word representation.
+Named Entity Recognition (NER) is a fundamental task in Natural Language Processing (NLP) that involves identifying and classifying named entities such as persons, organizations, locations, and miscellaneous entities in a given text. In this project, I implemented a CNN + BiLSTM-based model for NER, leveraging pre-trained GloVe embeddings to enhance word representation.
 
 ## 2. Dataset Curation
 ### 2.1 CoNLL-2003 Dataset
@@ -18,19 +18,22 @@ The dataset used for this project is the **CoNLL-2003** dataset, which is widely
 | Validation | 3,250            |
 | Test       | 3,453            |
 
-The dataset is structured with tokens (`tokens`), POS tags (`pos_tags`), chunking tags (`chunk_tags`), and NER labels (`ner_tags`). However, we only used `tokens` and `ner_tags` for this project.
+The dataset is structured with tokens (`tokens`), POS tags (`pos_tags`), chunking tags (`chunk_tags`), and NER labels (`ner_tags`). However, I only used `tokens` and `ner_tags` for this project.
+
+**Dataset Source:** [Hugging Face - CoNLL-2003 Dataset](https://huggingface.co/datasets/conll2003)
 
 ## 3. Word Embeddings and Model Architecture
 ### 3.1 Word Embeddings
-To improve model performance, we utilized **pre-trained GloVe embeddings (300D)** from Stanford NLP.
+To improve model performance, I utilized **pre-trained GloVe embeddings (300D)** from Stanford NLP.
 - Source: `glove.6B.300d.txt`
 - Vocabulary Size: 400,000
 - Embedding Dimension: 300
+- **Reference:** [Stanford NLP - GloVe Embeddings](https://nlp.stanford.edu/projects/glove/)
 
-Each word in the dataset is mapped to a corresponding vector representation from the GloVe embeddings. Additionally, we introduced a **padding token (`<PAD>`)** with an all-zero vector to handle variable-length sequences.
+Each word in the dataset is mapped to a corresponding vector representation from the GloVe embeddings. Additionally, I introduced a **padding token (`<PAD>`)** with an all-zero vector to handle variable-length sequences.
 
 ### 3.2 Model Architecture: CNN + BiLSTM
-We designed a **hybrid CNN + BiLSTM model** that effectively captures both local and long-range dependencies in text sequences. The model consists of the following layers:
+I designed a **hybrid CNN + BiLSTM model** that effectively captures both local and long-range dependencies in text sequences. The model consists of the following layers:
 
 1. **Embedding Layer**: Maps word indices to 300D GloVe embeddings.
 2. **1D CNN Layer**: Extracts local features from word embeddings.
@@ -59,7 +62,7 @@ The model was trained for **5 epochs**, achieving a consistently decreasing loss
 | 5     | 0.0152 |
 
 ### **Evaluation on Test Set**
-We evaluated the model using **precision, recall, and F1-score**, computed with `seqeval.metrics.classification_report`.
+I evaluated the model using **precision, recall, and F1-score**, computed with `seqeval.metrics.classification_report`.
 
 #### **Classification Report:**
 | Entity | Precision | Recall | F1-Score | Support |
@@ -78,7 +81,7 @@ Adding a **CNN layer** before BiLSTM improved the model’s ability to recognize
 Using **pre-trained GloVe embeddings** significantly boosted model performance compared to random initialization. Without GloVe, F1-scores were **~5% lower**.
 
 ### 5.3 Hyperparameter Tuning
-We experimented with:
+I experimented with:
 - **Batch sizes (16, 32, 64)** → Best performance with **32**.
 - **Learning rates (0.0001, 0.001, 0.01)** → **0.001** worked best.
 - **LSTM Hidden Units (128, 256, 512)** → Best result with **256 units**.
@@ -96,10 +99,3 @@ We experimented with:
 
 ## 7. Conclusion
 This project successfully implemented a **CNN + BiLSTM model** for Named Entity Recognition using the **CoNLL-2003 dataset** and **GloVe word embeddings**. The model achieved an overall **F1-score of 82%**, demonstrating the effectiveness of combining convolutional and recurrent layers in NER tasks. Further improvements could be made by integrating CRFs and training on larger datasets.
-
----
-
-### **References**
-1. T. Mikolov, K. Chen, G. Corrado, & J. Dean. *Efficient Estimation of Word Representations in Vector Space*. arXiv preprint arXiv:1301.3781, 2013.
-2. Y. Kim. *Convolutional Neural Networks for Sentence Classification*. EMNLP, 2014.
-3. CoNLL-2003 Dataset. Hugging Face. [https://huggingface.co/datasets/conll2003](https://huggingface.co/datasets/conll2003)
