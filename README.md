@@ -1,101 +1,93 @@
-# Named Entity Recognition using CNN + BiLSTM and GloVe Embeddings
+# Named Entity Recognition (NER) with CNN + BiLSTM
 
-## 1. Introduction
-Named Entity Recognition (NER) is a fundamental task in Natural Language Processing (NLP) that involves identifying and classifying named entities such as persons, organizations, locations, and miscellaneous entities in a given text. In this project, I implemented a CNN + BiLSTM-based model for NER, leveraging pre-trained GloVe embeddings to enhance word representation.
+## Project Overview
 
-## 2. Dataset Curation
-### 2.1 CoNLL-2003 Dataset
-The dataset used for this project is the **CoNLL-2003** dataset, which is widely recognized for NER tasks. The dataset consists of text sequences labeled with four entity types:
-- **PER**: Person names
-- **ORG**: Organizations
-- **LOC**: Locations
-- **MISC**: Miscellaneous entities (e.g., nationalities, events)
+This project implements a **Named Entity Recognition (NER) model** using a combination of **Convolutional Neural Networks (CNNs) and Bidirectional Long Short-Term Memory Networks (BiLSTMs)**. The model is trained on the **CoNLL-2003 dataset** and leverages **pre-trained GloVe word embeddings** for enhanced text representation. The goal is to classify words into entity categories such as **Person (PER), Location (LOC), Organization (ORG), and Miscellaneous (MISC)**.
 
-#### Dataset Statistics:
-| Split       | Number of Sentences |
-|------------|------------------|
-| Training   | 14,041           |
-| Validation | 3,250            |
-| Test       | 3,453            |
+## Dataset
 
-The dataset is structured with tokens (`tokens`), POS tags (`pos_tags`), chunking tags (`chunk_tags`), and NER labels (`ner_tags`). However, I only used `tokens` and `ner_tags` for this project.
+I use the **CoNLL-2003 dataset**, a widely used benchmark dataset for NER. It consists of labeled sentences with four named entity categories.
 
-**Dataset Source:** [Hugging Face - CoNLL-2003 Dataset](https://huggingface.co/datasets/conll2003)
+- Dataset link: [CoNLL-2003 on Hugging Face](https://huggingface.co/datasets/conll2003)
+- Features:
+  - **Tokens**: Words in a sentence
+  - **NER Tags**: Named entity labels
+  - **POS Tags**: Part-of-speech tags
+  - **Chunk Tags**: Syntactic chunking labels
 
-## 3. Word Embeddings and Model Architecture
-### 3.1 Word Embeddings
-To improve model performance, I utilized **pre-trained GloVe embeddings (300D)** from Stanford NLP.
-- Source: `glove.6B.300d.txt`
-- Vocabulary Size: 400,000
-- Embedding Dimension: 300
-- **Reference:** [Stanford NLP - GloVe Embeddings](https://nlp.stanford.edu/projects/glove/)
+## Pre-trained Word Embeddings
 
-Each word in the dataset is mapped to a corresponding vector representation from the GloVe embeddings. Additionally, I introduced a **padding token (`<PAD>`)** with an all-zero vector to handle variable-length sequences.
+I use **GloVe (Global Vectors for Word Representation)** embeddings to convert words into dense vector representations.
 
-### 3.2 Model Architecture: CNN + BiLSTM
-I designed a **hybrid CNN + BiLSTM model** that effectively captures both local and long-range dependencies in text sequences. The model consists of the following layers:
+- Download GloVe embeddings: [GloVe 6B Dataset](https://nlp.stanford.edu/projects/glove/)
+- I use the **300-dimensional embeddings (glove.6B.300d.txt)**.
 
-1. **Embedding Layer**: Maps word indices to 300D GloVe embeddings.
-2. **1D CNN Layer**: Extracts local features from word embeddings.
-3. **Bidirectional LSTM (BiLSTM)**: Captures context dependencies from both past and future words.
-4. **Fully Connected Layer**: Maps LSTM outputs to named entity labels.
-5. **Dropout (0.5)**: Prevents overfitting.
-6. **Softmax Activation**: Outputs probability distribution for each word’s NER label.
+## Model Architecture
 
-### 3.3 Training Process
-- **Loss Function**: CrossEntropyLoss
-- **Optimizer**: Adam with learning rate = 0.001
-- **Batch Size**: 32
-- **Padding Strategy**: Dynamic padding using `pad_sequence()`
-- **Training Duration**: 5 epochs
+The model consists of three main components:
 
-## 4. Results and Performance Evaluation
-The model was trained for **5 epochs**, achieving a consistently decreasing loss:
+1. **Embedding Layer**
+   - Loads pre-trained GloVe embeddings
+   - Converts words into fixed-size dense vectors
+2. **CNN Layer**
+   - Extracts local features (e.g., prefixes/suffixes) from word embeddings
+3. **BiLSTM Layer**
+   - Captures long-term dependencies from both forward and backward contexts
+4. **Fully Connected Layer**
+   - Classifies words into NER categories
 
-#### Training Loss per Epoch:
-| Epoch | Loss |
-|-------|------|
-| 1     | 0.1406 |
-| 2     | 0.0399 |
-| 3     | 0.0284 |
-| 4     | 0.0199 |
-| 5     | 0.0152 |
+## Training & Evaluation
 
-### **Evaluation on Test Set**
-I evaluated the model using **precision, recall, and F1-score**, computed with `seqeval.metrics.classification_report`.
+- **Loss function:** Cross-Entropy Loss
+- **Optimizer:** Adam Optimizer
+- **Batch size:** 32
+- **Epochs:** 5
+- **Evaluation Metrics:** Precision, Recall, F1-score (using `seqeval` library)
 
-#### **Classification Report:**
-| Entity | Precision | Recall | F1-Score | Support |
-|--------|----------|--------|----------|---------|
-| LOC    | 0.85     | 0.89   | 0.87     | 1668    |
-| MISC   | 0.67     | 0.70   | 0.68     | 702     |
-| ORG    | 0.73     | 0.78   | 0.76     | 1661    |
-| PER    | 0.91     | 0.86   | 0.88     | 1617    |
-| **Overall** | **0.81** | **0.83** | **0.82** | **5648** |
+### Model Performance
 
-## 5. Analysis and Experiments
-### 5.1 Impact of CNN Layer
-Adding a **CNN layer** before BiLSTM improved the model’s ability to recognize local patterns within words, enhancing its accuracy.
+| Entity Type | Precision | Recall   | F1-score | Support |
+| ----------- | --------- | -------- | -------- | ------- |
+| LOC         | 0.85      | 0.89     | 0.87     | 1668    |
+| MISC        | 0.67      | 0.70     | 0.68     | 702     |
+| ORG         | 0.73      | 0.78     | 0.76     | 1661    |
+| PER         | 0.91      | 0.86     | 0.88     | 1617    |
+| **Overall** | **0.81**  | **0.83** | **0.82** | 5648    |
 
-### 5.2 Impact of Pre-trained GloVe Embeddings
-Using **pre-trained GloVe embeddings** significantly boosted model performance compared to random initialization. Without GloVe, F1-scores were **~5% lower**.
+## Installation & Usage
 
-### 5.3 Hyperparameter Tuning
-I experimented with:
-- **Batch sizes (16, 32, 64)** → Best performance with **32**.
-- **Learning rates (0.0001, 0.001, 0.01)** → **0.001** worked best.
-- **LSTM Hidden Units (128, 256, 512)** → Best result with **256 units**.
+### 1. Clone the Repository
 
-## 6. Lessons Learned & Future Work
-### 6.1 Lessons Learned
-- **Combining CNN + BiLSTM is effective** for NER tasks, as CNN extracts local features while BiLSTM captures context dependencies.
-- **Pre-trained embeddings like GloVe significantly enhance performance.**
-- **Dynamic padding ensures efficient batch processing.**
+```bash
+git clone https://github.com/your-username/ner-cnn-bilstm.git
+cd ner-cnn-bilstm
+```
 
-### 6.2 Future Improvements
-- Implement **CRF (Conditional Random Fields)** for better label dependency handling.
-- Train with **larger datasets** (e.g., OntoNotes 5.0) to improve generalization.
-- Experiment with **character-level CNNs** to capture subword-level information.
+### 2. Install Dependencies
+Ensure you have Python 3.8+ and the following libraries installed:
+```bash
+pip install torch torchvision torchaudio
+pip install datasets transformers
+pip install numpy pandas tqdm
+pip install seqeval
+pip install matplotlib
+```
 
-## 7. Conclusion
-This project successfully implemented a **CNN + BiLSTM model** for Named Entity Recognition using the **CoNLL-2003 dataset** and **GloVe word embeddings**. The model achieved an overall **F1-score of 82%**, demonstrating the effectiveness of combining convolutional and recurrent layers in NER tasks. Further improvements could be made by integrating CRFs and training on larger datasets.
+### 3. Download Pre-trained GloVe Embeddings
+
+```bash
+wget http://nlp.stanford.edu/data/glove.6B.zip
+unzip glove.6B.zip -d glove/
+```
+
+### 4. Run Training Script
+
+```bash
+python train.py
+```
+
+### 5. Evaluate the Model
+
+```bash
+python evaluate.py
+```
