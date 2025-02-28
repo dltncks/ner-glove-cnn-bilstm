@@ -6,7 +6,7 @@ This project implements a **Named Entity Recognition (NER) model** using a combi
 
 ## Dataset
 
-I use the **CoNLL-2003 dataset**, a widely used benchmark dataset for NER. It consists of labeled sentences with four named entity categories.
+The dataset used for this project is the **CoNLL-2003 dataset**, which is widely used benchmark dataset for NER. It consists of labeled sentences with four named entity categories.
 
 - Dataset link: [CoNLL-2003 on Hugging Face](https://huggingface.co/datasets/conll2003)
 - Features:
